@@ -1,0 +1,19 @@
+#!/bin/bash -e
+#SBATCH -p nbi-medium # partition (queue)
+#SBATCH --mail-type=BEGIN,END,FAIL # notifications for job done & fail
+#SBATCH --mail-user=david.lyons@jic.ac.uk # send-to address
+#SBATCH --array=0-11    #which elements in the array to take; change for different number of samples
+#SBATCH --mem=100g
+
+source bowtie2-2.3.4.1
+
+
+trimroot=/jic/scratch/groups/Daniel-Zilberman/Projects/dave/0-bcl_and_fq_jic/210219_NB501793_0226_AH552WBGXG_demux
+alignroot=/jic/scratch/groups/Daniel-Zilberman/Projects/dave/1-mapped_reads_jic/210219_NB501793_0226_AH552WBGXG_dzdl63a_chips
+
+ARRAY=(tk27_ddcc_1 tk27_ddcc_2 tk27_h1ddcc_1 tk27_h1ddcc_2 wt_H2az_agrisera h1_H2az_agrisera input_to_1 input_to_2 input_to_4 input_to_5 input_to_7 input_to_8)
+#ARRAY=(all filenames)
+
+
+
+srun bowtie2 -p 20 -x /jic/scratch/groups/Daniel-Zilberman/Projects/dave/genomeIndex/bowtie2/tair10 -1 "${trimroot}"/${ARRAY[$SLURM_ARRAY_TASK_ID]}_R1_001.fastq.gz -2 "${trimroot}"/${ARRAY[$SLURM_ARRAY_TASK_ID]}_R2_001.fastq.gz -S "${alignroot}"/${ARRAY[$SLURM_ARRAY_TASK_ID]}.sam
